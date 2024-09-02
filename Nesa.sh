@@ -95,35 +95,85 @@ function install_node() {
 
     # 配置节点
     echo "配置节点..."
-    echo "请为您的节点选择一个唯一的名称："
-    read -p "Choose a moniker for your node: " NODE_NAME
+    read -p "请为您的节点选择一个唯一的名称： " NODE_NAME
 
-    echo "您的节点类型是 Validator 还是 Miner？"
-    echo "[ ] Validator"
-    echo "[ ] Miner"
-    read -p "What type(s) of node is $NODE_NAME? (Validator/Miner): " NODE_TYPE
-
-    if [[ "$NODE_TYPE" == "Validator" ]]; then
-        read -p "Validator's Private Key: " PRIVATE_KEY
-    elif [[ "$NODE_TYPE" == "Miner" ]]; then
-        echo "矿工类型：在 Distributed Miner 或 Non-Distributed Miner 之间进行选择。"
-        echo "[ ] Distributed Miner"
-        echo "[ ] Non-Distributed Miner"
-        read -p "What type of miner will $NODE_NAME be? (Distributed Miner/Non-Distributed Miner): " MINER_TYPE
-        
-        if [[ "$MINER_TYPE" == "Distributed Miner" ]]; then
-            echo "请选择现有 swarm 或启动新 swarm。"
-            echo "[ ] Join existing swarm"
-            echo "[ ] Start a new swarm"
-            read -p "Would you like to join an existing swarm or start a new one? (Join existing swarm/Start a new swarm): " SWARM_ACTION
-            
-            if [[ "$SWARM_ACTION" == "Start a new swarm" ]]; then
-                read -p "Which model would you like to run? (meta-llama/Llama-2-13b-Chat-Hf): " MODEL
-            fi
-        elif [[ "$MINER_TYPE" == "Non-Distributed Miner" ]]; then
-            read -p "Which model would you like to run? (meta-llama/Llama-2-13b-Chat-Hf): " MODEL
-        fi
-    fi
+    PS3="请选择节点类型: "
+    NODE_TYPE_OPTIONS=("Validator" "Miner" "退出")
+    select NODE_TYPE in "${NODE_TYPE_OPTIONS[@]}"
+    do
+        case $NODE_TYPE in
+            "Validator")
+                read -p "Validator's Private Key: " PRIVATE_KEY
+                echo "节点名称: $NODE_NAME"
+                echo "节点类型: Validator"
+                echo "Validator's Private Key: $PRIVATE_KEY"
+                break
+                ;;
+            "Miner")
+                PS3="请选择矿工类型: "
+                MINER_TYPE_OPTIONS=("Distributed Miner" "Non-Distributed Miner" "退出")
+                select MINER_TYPE in "${MINER_TYPE_OPTIONS[@]}"
+                do
+                    case $MINER_TYPE in
+                        "Distributed Miner")
+                            PS3="请选择 swarm 操作: "
+                            SWARM_ACTION_OPTIONS=("Join existing swarm" "Start a new swarm" "退出")
+                            select SWARM_ACTION in "${SWARM_ACTION_OPTIONS[@]}"
+                            do
+                                case $SWARM_ACTION in
+                                    "Start a new swarm")
+                                        read -p "Which model would you like to run? (meta-llama/Llama-2-13b-Chat-Hf): " MODEL
+                                        echo "节点名称: $NODE_NAME"
+                                        echo "节点类型: Miner"
+                                        echo "矿工类型: Distributed Miner"
+                                        echo "Swarm 操作: Start a new swarm"
+                                        echo "模型: $MODEL"
+                                        break
+                                        ;;
+                                    "Join existing swarm")
+                                        echo "加入现有 swarm 的逻辑尚未实现。"
+                                        echo "节点名称: $NODE_NAME"
+                                        echo "节点类型: Miner"
+                                        echo "矿工类型: Distributed Miner"
+                                        echo "Swarm 操作: Join existing swarm"
+                                        break
+                                        ;;
+                                    "退出")
+                                        exit 1
+                                        ;;
+                                    *)
+                                        echo "无效的选项 $REPLY"
+                                        ;;
+                                esac
+                            done
+                            break
+                            ;;
+                        "Non-Distributed Miner")
+                            read -p "Which model would you like to run? (meta-llama/Llama-2-13b-Chat-Hf): " MODEL
+                            echo "节点名称: $NODE_NAME"
+                            echo "节点类型: Miner"
+                            echo "矿工类型: Non-Distributed Miner"
+                            echo "模型: $MODEL"
+                            break
+                            ;;
+                        "退出")
+                            exit 1
+                            ;;
+                        *)
+                            echo "无效的选项 $REPLY"
+                            ;;
+                    esac
+                done
+                break
+                ;;
+            "退出")
+                exit 1
+                ;;
+            *)
+                echo "无效的选项 $REPLY"
+                ;;
+        esac
+    done
 
     # 为所有操作系统运行远程脚本
     echo "运行远程初始化脚本..."

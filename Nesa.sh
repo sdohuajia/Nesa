@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# 主菜单函数
+ 主菜单函数
 function main_menu() {
     while true; do
         clear
@@ -12,14 +12,18 @@ function main_menu() {
         echo "退出脚本，请按键盘 ctrl+c 退出即可"
         echo "请选择要执行的操作:"
         echo "1) 安装节点"
-        echo "2) 退出"
-        read -p "请输入选项 [1-2]: " choice
+        echo "2) 获取节点状态 URL"
+        echo "3) 退出"
+        read -p "请输入选项 [1-3]: " choice
 
         case $choice in
             1)
                 install_node
                 ;;
             2)
+                get_node_status_url
+                ;;
+            3)
                 echo "退出脚本。"
                 exit 0
                 ;;
@@ -28,6 +32,16 @@ function main_menu() {
                 ;;
         esac
     done
+}
+
+# 获取节点状态 URL 函数
+function get_node_status_url() {
+    if [ -f "$HOME/.nesa/identity/node_id.id" ]; then
+        PUB_KEY=$(cat $HOME/.nesa/identity/node_id.id)
+        echo "节点状态 URL: https://node.nesa.ai/nodes/$PUB_KEY"
+    else
+        echo "节点身份文件未找到，请确认 $HOME/.nesa/identity/node_id.id 是否存在。"
+    fi
 }
 
 # 安装节点函数

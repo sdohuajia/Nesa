@@ -186,6 +186,9 @@ function install_node() {
     else
         echo "Docker Compose 容器启动失败，请检查配置和日志。"
     fi
+
+    # 等待用户按任意键以返回主菜单
+    read -p "按任意键返回主菜单..."
 }
 
 # 运行主菜单

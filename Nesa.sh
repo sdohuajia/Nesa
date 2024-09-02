@@ -110,6 +110,18 @@ function install_node() {
         echo "jq 已安装。"
     fi
 
+    # 检测 Docker Compose 是否安装
+    if ! command -v docker-compose &> /dev/null
+    then
+        echo "Docker Compose 未安装，正在安装 Docker Compose。"
+        # 安装 Docker Compose
+        DOCKER_COMPOSE_VERSION="v2.18.1"  # 可以根据需要调整版本
+        sudo curl -L "https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE_VERSION/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+        sudo chmod +x /usr/local/bin/docker-compose
+    else
+        echo "Docker Compose 已安装。"
+    fi
+
     # 配置节点
     echo "配置节点..."
     read -p "请为您的节点选择一个唯一的名称： " NODE_NAME

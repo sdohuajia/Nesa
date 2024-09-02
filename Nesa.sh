@@ -42,6 +42,9 @@ function get_node_status_url() {
     else
         echo "节点身份文件未找到，请确认 $HOME/.nesa/identity/node_id.id 是否存在。"
     fi
+
+    # 等待用户按任意键以返回主菜单
+    read -p "按任意键返回主菜单..."
 }
 
 # 安装节点函数

@@ -1,6 +1,6 @@
 #!/bin/bash
 
- 主菜单函数
+# 主菜单函数
 function main_menu() {
     while true; do
         clear
@@ -54,31 +54,37 @@ function install_node() {
     sudo apt-get update
     sudo apt-get install -y curl
 
-    # 添加 Docker 的 GPG 密钥
-    echo "添加 Docker 的 GPG 密钥..."
-    sudo apt-get update
-    sudo apt-get install -y ca-certificates curl
-    sudo install -m 0755 -d /etc/apt/keyrings
-    sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-    sudo chmod a+r /etc/apt/keyrings/docker.asc
+    # 检测 Docker 是否安装
+    if ! command -v docker &> /dev/null; then
+        echo "Docker 未安装，正在安装 Docker..."
+        
+        # 添加 Docker 的 GPG 密钥
+        echo "添加 Docker 的 GPG 密钥..."
+        sudo apt-get update
+        sudo apt-get install -y ca-certificates curl
+        sudo install -m 0755 -d /etc/apt/keyrings
+        sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+        sudo chmod a+r /etc/apt/keyrings/docker.asc
 
-    # 将 Docker 仓库添加到 APT 源中
-    echo "添加 Docker 仓库..."
-    echo \
-      "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
-      $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
-      sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-    sudo apt-get update
-    sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+        # 将 Docker 仓库添加到 APT 源中
+        echo "添加 Docker 仓库..."
+        echo \
+          "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+          $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+          sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+        sudo apt-get update
+        sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
-    # 启动 Docker 服务
-    echo "启动 Docker 服务..."
-    sudo systemctl start docker
-    sudo systemctl enable docker
+        # 启动 Docker 服务
+        echo "启动 Docker 服务..."
+        sudo systemctl start docker
+        sudo systemctl enable docker
+    else
+        echo "Docker 已安装。"
+    fi
 
     # 检测 NVIDIA GPU 驱动是否安装
-    if ! command -v nvidia-smi &> /dev/null
-    then
+    if ! command -v nvidia-smi &> /dev/null; then
         echo "NVIDIA 驱动未安装，正在安装最新版本的 NVIDIA 驱动。"
 
         # 添加 NVIDIA 官方 PPA
@@ -92,8 +98,7 @@ function install_node() {
     fi
 
     # 安装 gum（如果不存在）
-    if ! command -v gum &> /dev/null
-    then
+    if ! command -v gum &> /dev/null; then
         echo "gum 未安装，正在安装 gum。"
         # 下载安装 gum
         curl -fsSL https://github.com/charmbracelet/gum/releases/download/v0.18.0/gum_0.18.0_linux_amd64.tar.gz | sudo tar xz -C /usr/local/bin
@@ -102,8 +107,7 @@ function install_node() {
     fi
 
     # 安装 jq（如果不存在）
-    if ! command -v jq &> /dev/null
-    then
+    if ! command -v jq &> /dev/null; then
         echo "jq 未安装，正在安装 jq。"
         sudo apt-get install -y jq
     else
@@ -111,8 +115,7 @@ function install_node() {
     fi
 
     # 检测 Docker Compose 是否安装
-    if ! command -v docker-compose &> /dev/null
-    then
+    if ! command -v docker-compose &> /dev/null; then
         echo "Docker Compose 未安装，正在安装 Docker Compose。"
         # 安装 Docker Compose
         DOCKER_COMPOSE_VERSION="v2.18.1"  # 可以根据需要调整版本

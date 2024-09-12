@@ -13,8 +13,9 @@ function main_menu() {
         echo "请选择要执行的操作:"
         echo "1) 安装节点"
         echo "2) 获取节点状态 URL"
-        echo "3) 退出"
-        read -p "请输入选项 [1-3]: " choice
+        echo "3) 获取节点信息"
+        echo "4) 退出"
+        read -p "请输入选项 [1-4]: " choice
 
         case $choice in
             1)
@@ -24,6 +25,9 @@ function main_menu() {
                 get_node_status_url
                 ;;
             3)
+                get_node_info
+                ;;
+            4)
                 echo "退出脚本。"
                 exit 0
                 ;;
@@ -41,6 +45,24 @@ function get_node_status_url() {
         echo "节点状态 URL: https://node.nesa.ai/nodes/$PUB_KEY"
     else
         echo "节点身份文件未找到，请确认 $HOME/.nesa/identity/node_id.id 是否存在。"
+    fi
+
+    # 等待用户按任意键以返回主菜单
+    read -p "按任意键返回主菜单..."
+}
+
+# 获取节点信息函数
+function get_node_info() {
+    ENV_FILE="/root/.nesa/env/agent.env"
+
+    if [ -f "$ENV_FILE" ]; then
+        echo "获取节点信息:"
+        echo "========================================"
+        grep '^LETSENCRYPT_EMAIL=' $ENV_FILE | cut -d '=' -f2
+        grep '^NODE_HOSTNAME=' $ENV_FILE | cut -d '=' -f2
+        grep '^NODE_PRIV_KEY=' $ENV_FILE | cut -d '=' -f2
+    else
+        echo "环境文件未找到，请确认 $ENV_FILE 是否存在。"
     fi
 
     # 等待用户按任意键以返回主菜单

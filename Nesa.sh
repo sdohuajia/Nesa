@@ -13,7 +13,7 @@ function main_menu() {
         echo "请选择要执行的操作:"
         echo "1) 安装节点"
         echo "2) 获取节点状态 URL"
-        echo "3) 获取节点信息"
+        echo "3) 获取节点信息（私钥）"
         echo "4) 退出"
         read -p "请输入选项 [1-4]: " choice
 

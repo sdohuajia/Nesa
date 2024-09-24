@@ -253,10 +253,11 @@ function install_node() {
 
     # 尝试启动 docker-compose
     echo "尝试启动 Docker Compose 容器..."
+    cd /root/.nesa/docker
     if sudo docker-compose up -d; then
-        echo "Docker Compose 容器启动成功。"
+    echo "Docker Compose 容器启动成功。"
     else
-        echo "Docker Compose 容器启动失败，请检查配置和日志。"
+    echo "Docker Compose 容器启动失败，请检查配置和日志。"
     fi
 
     # 等待用户按任意键以返回主菜单

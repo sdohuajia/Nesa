@@ -105,6 +105,15 @@ function install_node() {
         echo "Docker 已安装。"
     fi
 
+    # 添加用户到 Docker 组
+    if ! getent group docker > /dev/null; then
+        echo "创建 Docker 组..."
+        sudo groupadd docker
+    fi
+
+    echo "将用户 $USER 添加到 Docker 组..."
+    sudo usermod -aG docker $USER
+    
     # 检测 NVIDIA GPU 驱动是否安装
     if ! command -v nvidia-smi &> /dev/null; then
         echo "NVIDIA 驱动未安装，正在安装最新版本的 NVIDIA 驱动。"

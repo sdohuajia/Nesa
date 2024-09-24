@@ -139,13 +139,19 @@ function install_node() {
     # 检测 Docker Compose 是否安装
     if ! command -v docker-compose &> /dev/null; then
         echo "Docker Compose 未安装，正在安装 Docker Compose。"
-        # 安装 Docker Compose
-        DOCKER_COMPOSE_VERSION="v2.18.1"  # 可以根据需要调整版本
-        sudo curl -L "https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE_VERSION/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-        sudo chmod +x /usr/local/bin/docker-compose
+        
+        # 获取最新版本
+        VER=$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep tag_name | cut -d '"' -f 4)
+        curl -L "https://github.com/docker/compose/releases/download/$VER/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+        
+        # 设置可执行权限
+        chmod +x /usr/local/bin/docker-compose
     else
         echo "Docker Compose 已安装。"
     fi
+
+    # 验证安装
+    docker-compose --version
 
     # 配置节点
     echo "配置节点..."
